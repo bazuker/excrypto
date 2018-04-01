@@ -1,16 +1,19 @@
 from filtering import SymbolFilter
 
 class DealAnalyzer:
-	# analyzes the situation and returns the best deals
-	def analyzeGateways(self, g1, g2, progress_callback):
+	# returns matching pairs
+	def matchGatewaysPairs(self, g1, g2):
 		# retrieve the pairs
 		g1_pairs = g1.get_pairs()
 		g2_pairs = g2.get_pairs()
 		# filter the pairs
-		filter = SymbolFilter()
-		available_pairs = filter.splitPairs(filter.matchPairs(g1_pairs, g2_pairs))
-		available_pairs_len = len(available_pairs)
+		filter = SymbolFilter() 
+		return filter.splitPairs(filter.matchPairs(g1_pairs, g2_pairs))
 
+	# analyzes the situation and returns the best deals
+	def analyzeGateways(self, g1, g2, progress_callback):
+		available_pairs = self.matchGatewaysPairs(g1, g2)
+		available_pairs_len = len(available_pairs)
 		# scan all available pairs
 		deals = []
 		n = 0
