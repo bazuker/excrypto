@@ -30,7 +30,7 @@ analyzer = DealAnalyzer()
 count = 0
 try:
     while True:
-        count = analyzer.analyze([kucoin_gateway, hitbtc_gateway, binance_gateway], None, progress)
+        count += analyzer.analyze([kucoin_gateway, hitbtc_gateway, binance_gateway], None, progress)
         print("waiting...")
         time.sleep(randint(60, 180))
 
