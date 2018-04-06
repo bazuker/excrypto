@@ -43,18 +43,18 @@ for e1 in exList:
             print(e1.identifier, "to", e2.identifier)
 
             rate = e1.compare(e2)           
-            if rate.isProfitable():
+            if rate.is_profitable():
                 deals.append(rate)
-                rate.printAll()
+                rate.print_all()
                 #rate.exchange.gateway.bid(...)
             else:
                 print("skipping")
 
             print("-- inverse --")
             rate = e2.compare(e1)        
-            if rate.isProfitable():
+            if rate.is_profitable():
                 deals.append(rate)  
-                rate.printAll()
+                rate.print_all()
                 # rate.exchange.gateway.bid(...)
             else:
                 print("skipping")   
