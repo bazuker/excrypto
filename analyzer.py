@@ -1,18 +1,17 @@
 import sqlite3
 import sys
+import os
 
 from filtering import SymbolFilter
 
 
 class DealAnalyzer:
+    def __init__(self):
+        self.symbolFilter = SymbolFilter()
+
     # returns matching pairs
     def match_gateways_pairs(self, g1, g2):
-        # retrieve the pairs
-        g1_pairs = g1.get_pairs()
-        g2_pairs = g2.get_pairs()
-        # filter the pairs
-        f = SymbolFilter()
-        return f.split_pairs(f.match_pairs(g1_pairs, g2_pairs))
+        return self.symbolFilter.split_pairs(self.symbolFilter.match_pairs(g1.get_pairs(), g2.get_pairs()))
 
     # analyzes the situation and returns the best deals
     def analyze_gateways(self, g1, g2, pairs, progress_callback):
@@ -73,8 +72,10 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                         c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?)', t)
                         conn.commit()
                         count += len(new_deals)
-        except:
-            print("Unexpected error:", sys.exc_info()[0])
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
         finally:
             conn.close()
         return count

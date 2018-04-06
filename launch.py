@@ -1,4 +1,6 @@
-import os, sys, time
+import os
+import sys
+import time
 from random import randint
 
 from analyzer import DealAnalyzer

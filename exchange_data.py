@@ -29,8 +29,8 @@ class ExchangeRate:
 
 
 class Exchange:
-    def __init__(self, identifier=None, ask=None, ask_size=None, bid=None, bid_size=None, sym1=None, sym2=None,
-                 gateway=None):
+    def __init__(self, identifier=None, ask=None, ask_size=None, bid=None, bid_size=None,
+                 sym1=None, sym2=None, gateway=None):
         self.identifier = identifier  # exchanger api identifier
         self.gateway = gateway  # exchanger api gateway
         self.ask = ask
