@@ -1,37 +1,40 @@
 import os
 import sys
 import time
+import ccxt
+
 from random import randint
-
-from analyzer import DealAnalyzer
-from binance_gateway import BinanceGateway
-from hitbtc_gateway import HitbtcGateway
-from kucoin_gateway import KucoinGateway
-
-kucoin_gateway = KucoinGateway()
-hitbtc_gateway = HitbtcGateway()
-binance_gateway = BinanceGateway()
+from ccxt_analyzer import DealAnalyzer
 
 
-def cls():
+def clean_print(*args):
     os.system('cls' if os.name == 'nt' else 'clear')
+    print(*args)
 
 
-def progress(n, p, total):
-    cls()
-    print('scanned', n, 'out of', total, '|', p)
-    if n == total:
-        print("next...")
+def progress(n, p, g1, g2, total):
+    if n == 1:
+        clean_print(g1.id, "/", g2.id)
+    print(n, 'out of', total, '|', p)
     return False  # continue
 
 
-# pairs = [['ETH', 'BTC'], ['BTC', 'ETH'], ['LTC', 'USDT'], ['USDT', 'LTC']]
+hitbtc = ccxt.hitbtc()
+binance = ccxt.binance()
+kucoin = ccxt.kucoin()
+poloniex = ccxt.poloniex()
+bittrex = ccxt.bittrex()
+gateways = [bittrex, hitbtc, binance, kucoin, poloniex]
+
+pairs = ['LTC/BTC', 'LTC/USDT',
+         'ETH/USDT', 'ETH/BTC',
+         'XMR/BTC', 'ETC/ETH']
 analyzer = DealAnalyzer()
 count = 0
 try:
     while True:
-        count = analyzer.analyze([kucoin_gateway, hitbtc_gateway, binance_gateway], None, progress)
-        print("waiting...")
+        count = analyzer.analyze(gateways, pairs, progress)
+        print("added", count, "deals. Waiting...")
         time.sleep(randint(60, 180))
 
 except KeyboardInterrupt:

@@ -5,7 +5,6 @@ def truncate(number, digits) -> float:
     stepper = pow(10.0, digits)
     return math.trunc(stepper * number) / stepper
 
-
 class ExchangeRate:
     def __init__(self, bid=None, ask=None, dif=None, size=None, sizemul=None, ex1=None, ex2=None):
         self.bid = bid
