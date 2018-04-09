@@ -34,7 +34,7 @@ count = 0
 try:
     while True:
         count = analyzer.analyze(gateways, pairs, progress)
-        print("added", count, "deals. Waiting...")
+        print("totally added", count, "deals this round. Waiting...")
         time.sleep(randint(60, 120))
 
 except KeyboardInterrupt:
