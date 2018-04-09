@@ -1,8 +1,6 @@
 import sqlite3
-import sys
-import os
 from dealer import Dealer
-from ccxt.async import ExchangeError
+
 
 class DealAnalyzer:
 
