@@ -9,7 +9,7 @@ import asyncio
 data_cache = {}
 
 
-def convert_ccxt_orderbook(gateway, sym, orderbook):
+def convert_ccxt_order_book(gateway, sym, orderbook):
     symbols = [x.strip() for x in sym.split('/')]
     asks = orderbook['asks'][0]
     bids = orderbook['bids'][0]
@@ -20,12 +20,17 @@ def convert_ccxt_orderbook(gateway, sym, orderbook):
     return Exchange(gateway.id, ask_price, ask_size, bid_price, bid_size, symbols[0], symbols[1], gateway)
 
 
+async def convert_fetch(symbol, g):
+    return convert_ccxt_order_book(g, symbol, await g.fetch_order_book(symbol))
+
+
 async def fetch_order_books_async(symbol, g):
     try:
-        data = await g.fetch_order_book(symbol)
-        data_cache[g.id] = convert_ccxt_orderbook(g, symbol, data)
-    except ccxt.ExchangeError:
-        del data_cache[g.id]
+        data_cache[g.id] = await convert_fetch(symbol, g)
+    except ccxt.ExchangeError as e:
+        print(e)
+        if g.id in data_cache:
+            del data_cache[g.id]
 
 
 class Dealer:
