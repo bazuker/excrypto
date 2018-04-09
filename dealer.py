@@ -25,12 +25,13 @@ async def convert_fetch(symbol, g):
 
 
 async def fetch_order_books_async(symbol, g):
+    gid = g.id + symbol
     try:
-        data_cache[g.id] = await convert_fetch(symbol, g)
+        data_cache[gid] = await convert_fetch(symbol, g)
     except ccxt.ExchangeError as e:
         print(e)
         if g.id in data_cache:
-            del data_cache[g.id]
+            del data_cache[gid]
 
 
 class Dealer:
@@ -47,9 +48,11 @@ class Dealer:
         pending = asyncio.Task.all_tasks()
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*pending))
-        if self.g1.id in data_cache and self.g2.id in data_cache:
-            self.e1 = data_cache[self.g1.id]
-            self.e2 = data_cache[self.g2.id]
+        gid1 = self.g1.id + symbol
+        gid2 = self.g2.id + symbol
+        if gid1 in data_cache and gid2 in data_cache:
+            self.e1 = data_cache[gid1]
+            self.e2 = data_cache[gid2]
             return True
         return False
 
