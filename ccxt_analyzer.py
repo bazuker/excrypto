@@ -51,7 +51,6 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                 for g2 in gateways:
                     if g1.id != g2.id:
                         t = []
-                        new_deals = []
                         new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
                         if new_deals is None or len(new_deals) < 1:
                             continue
