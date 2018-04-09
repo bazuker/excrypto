@@ -24,7 +24,7 @@ binance = ccxt.binance()
 kucoin = ccxt.kucoin()
 poloniex = ccxt.poloniex()
 bittrex = ccxt.bittrex()
-gateways = [bittrex, hitbtc, binance, kucoin, poloniex]
+gateways = [kucoin, bittrex, hitbtc, binance, poloniex]
 
 pairs = ['LTC/BTC', 'LTC/USDT',
          'ETH/USDT', 'ETH/BTC',
@@ -35,7 +35,7 @@ try:
     while True:
         count = analyzer.analyze(gateways, pairs, progress)
         print("added", count, "deals. Waiting...")
-        time.sleep(randint(60, 180))
+        time.sleep(randint(60, 120))
 
 except KeyboardInterrupt:
     print('Stopped. Found', count, 'deals')

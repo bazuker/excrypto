@@ -21,8 +21,11 @@ def convert_ccxt_orderbook(gateway, sym, orderbook):
 
 
 async def fetch_order_books_async(symbol, g):
-    data = await g.fetch_order_book(symbol)
-    data_cache[g.id] = convert_ccxt_orderbook(g, symbol, data)
+    try:
+        data = await g.fetch_order_book(symbol)
+        data_cache[g.id] = convert_ccxt_orderbook(g, symbol, data)
+    except ccxt.ExchangeError:
+        del data_cache[g.id]
 
 
 class Dealer:
@@ -42,6 +45,8 @@ class Dealer:
         if self.g1.id in data_cache and self.g2.id in data_cache:
             self.e1 = data_cache[self.g1.id]
             self.e2 = data_cache[self.g2.id]
+            return True
+        return False
 
     def produce_deals(self):
         deals = []

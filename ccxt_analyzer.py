@@ -17,9 +17,7 @@ class DealAnalyzer:
         n = 0
         for p in pairs:
             # fetch the rates
-            try:
-                dealer.fetch_order_book(p)
-            except Exception:
+            if not dealer.fetch_order_book(p):
                 continue
             # update on progress
             n += 1
@@ -54,10 +52,7 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                     if g1.id != g2.id:
                         t = []
                         new_deals = []
-                        try:
-                            new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
-                        except ExchangeError as exr:
-                            print("error:", str(exr))
+                        new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
                         if new_deals is None or len(new_deals) < 1:
                             continue
                         for d in new_deals:
