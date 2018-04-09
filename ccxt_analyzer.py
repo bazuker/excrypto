@@ -1,10 +1,8 @@
 import sqlite3
 import sys
 import os
-
 from dealer import Dealer
-from ccxt import ExchangeError
-
+from ccxt.async import ExchangeError
 
 class DealAnalyzer:
 
@@ -18,12 +16,16 @@ class DealAnalyzer:
         deals = []
         n = 0
         for p in pairs:
+            # fetch the rates
+            try:
+                dealer.fetch_order_book(p)
+            except Exception:
+                continue
             # update on progress
             n += 1
             if progress_callback(n, p, g1, g2, pairs_len):
                 return
-            # fetch the rates
-            dealer.fetch_orderbook(p)
+            # find the deals based on retrieved data
             new_deals = dealer.produce_deals()
             if new_deals is None or len(new_deals) < 1:
                 continue

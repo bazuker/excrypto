@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-import ccxt
+import ccxt.async as ccxt
 
 from random import randint
 from ccxt_analyzer import DealAnalyzer
