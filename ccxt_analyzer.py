@@ -1,11 +1,31 @@
-import os
-import sys
+from functools import partial
+import ccxt.async as ccxt
+import asyncio
 import sqlite3
 
 from dealer import Dealer
 
 
 class DealAnalyzer:
+
+    def __init__(self, gateways):
+        self.gateways = gateways
+        self.markets = None
+
+    async def load_market_async(self, g):
+        self.markets[g.id] = await g.load_markets()
+
+    def load_markets(self):
+        self.markets = {}
+        [asyncio.ensure_future(self.load_market_async(g)) for g in self.gateways]
+        pending = asyncio.Task.all_tasks()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.gather(*pending))
+
+    def pair_in_market(self, g, pair):
+        c1 = g.id in self.markets
+        c2 = pair in self.markets[g.id]
+        return c1 and c2
 
     # analyzes the situation and returns the best deals
     def compare_gateways(self, g1, g2, pairs, progress_callback):
@@ -17,6 +37,9 @@ class DealAnalyzer:
         deals = []
         n = 0
         for p in pairs:
+            if not (self.pair_in_market(g1, p) and self.pair_in_market(g2, p)):
+                print(p, "is not in market of", g1.id, '/', g2.id)
+                continue
             # fetch the rates
             if not dealer.fetch_order_book(p):
                 continue
@@ -37,9 +60,11 @@ class DealAnalyzer:
     # look up for the best pairs across the gateways in the provided list
     # and saves them in the local database
     # returns amount of record added to the database
-    def analyze(self, gateways, pairs, progress_callback):
+    def analyze(self, pairs, progress_callback):
         if pairs is None:
-            pairs = []
+            return 0
+        if self.markets is None:
+            self.load_markets()
         # create a local database
         conn = sqlite3.connect('stocks.db')
         c = conn.cursor()
@@ -48,8 +73,8 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
         count = 0
         try:
             # start the analysis
-            for g1 in gateways:
-                for g2 in gateways:
+            for g1 in self.gateways:
+                for g2 in self.gateways:
                     if g1.id != g2.id:
                         t = []
                         new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
@@ -63,10 +88,7 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                         c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?)', t)
                         conn.commit()
                         count += len(new_deals)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+
         finally:
             conn.close()
         return count

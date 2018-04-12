@@ -28,11 +28,13 @@ exmo = ccxt.exmo()
 gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo]
 
 pairs = ['BCH/USDT', 'BTC/USDT', 'LTC/USDT']
-analyzer = DealAnalyzer()
+analyzer = DealAnalyzer(gateways)
+print('loading markets...')
+analyzer.load_markets()
 count = 0
 try:
     while True:
-        count = analyzer.analyze(gateways, pairs, progress)
+        count = analyzer.analyze(pairs, progress)
         print("totally added", count, "deals this round. Waiting...")
         time.sleep(randint(60, 120))
 
