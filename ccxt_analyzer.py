@@ -23,9 +23,7 @@ class DealAnalyzer:
         loop.run_until_complete(asyncio.gather(*pending))
 
     def pair_in_market(self, g, pair):
-        c1 = g.id in self.markets
-        c2 = pair in self.markets[g.id]
-        return c1 and c2
+        return g.id in self.markets and pair in self.markets[g.id]
 
     # analyzes the situation and returns the best deals
     def compare_gateways(self, g1, g2, pairs, progress_callback):
