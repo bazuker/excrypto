@@ -24,11 +24,10 @@ binance = ccxt.binance()
 kucoin = ccxt.kucoin()
 poloniex = ccxt.poloniex()
 bittrex = ccxt.bittrex()
-gateways = [kucoin, bittrex, hitbtc, binance, poloniex]
+exmo = ccxt.exmo()
+gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo]
 
-pairs = ['LTC/BTC', 'LTC/USDT',
-         'ETH/USDT', 'ETH/BTC',
-         'XMR/BTC', 'ETC/ETH']
+pairs = ['BCH/USDT', 'BTC/USDT', 'LTC/USDT']
 analyzer = DealAnalyzer()
 count = 0
 try:
@@ -40,3 +39,25 @@ try:
 except KeyboardInterrupt:
     print('Stopped. Found', count, 'deals')
     sys.exit(0)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
