@@ -16,6 +16,7 @@ def progress(n, p, g1, g2, total):
     if n == 1:
         clean_print(g1.id, "/", g2.id)
     print(n, 'out of', total, '|', p)
+    time.sleep(0.05)
     return False  # continue
 
 
@@ -25,7 +26,8 @@ kucoin = ccxt.kucoin()
 poloniex = ccxt.poloniex()
 bittrex = ccxt.bittrex()
 exmo = ccxt.exmo()
-gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo]
+liqui = ccxt.liqui()
+gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo, liqui]
 
 pairs = ['BCH/USDT', 'BTC/USDT', 'LTC/USDT']
 analyzer = DealAnalyzer(gateways)

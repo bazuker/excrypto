@@ -35,8 +35,9 @@ class DealAnalyzer:
         deals = []
         n = 0
         for p in pairs:
+            # check if the pair is available for trading in the exchangers
             if not (self.pair_in_market(g1, p) and self.pair_in_market(g2, p)):
-                print(p, "is not in market of", g1.id, '/', g2.id)
+                print(p, "is not in a market of", g1.id, '/', g2.id)
                 continue
             # fetch the rates
             if not dealer.fetch_order_book(p):
@@ -75,7 +76,11 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                 for g2 in self.gateways:
                     if g1.id != g2.id:
                         t = []
-                        new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
+                        new_deals = []
+                        try:
+                            new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
+                        except ccxt.DDoSProtection as e:
+                            continue
                         if new_deals is None or len(new_deals) < 1:
                             continue
                         for d in new_deals:
@@ -86,7 +91,6 @@ sym2 text, bid real, ask real, size real, sizemul real)''')
                         c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?)', t)
                         conn.commit()
                         count += len(new_deals)
-
         finally:
             conn.close()
         return count

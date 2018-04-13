@@ -32,6 +32,10 @@ async def fetch_order_books_async(symbol, g):
         print(e)
         if g.id in data_cache:
             del data_cache[gid]
+    except ccxt.RequestTimeout as e:
+        print(e)
+        if g.id in data_cache:
+            del data_cache[gid]
 
 
 class Dealer:

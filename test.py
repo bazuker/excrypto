@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import ccxt
 
-pair = 'DASH/USDT'
-exchanges = [ccxt.hitbtc(), ccxt.binance(), ccxt.exmo(),
+pair = 'BTC/USDT'
+exchanges = [ccxt.hitbtc(), ccxt.binance(), ccxt.exmo(), ccxt.liqui(),
              ccxt.kucoin(), ccxt.poloniex(), ccxt.bittrex()]
 
 
