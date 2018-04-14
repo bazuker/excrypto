@@ -1,4 +1,3 @@
-from functools import partial
 import ccxt.async as ccxt
 import asyncio
 import sqlite3
