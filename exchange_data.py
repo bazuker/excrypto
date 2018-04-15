@@ -1,5 +1,5 @@
 import math
-
+import time
 
 def truncate(number, digits) -> float:
     stepper = pow(10.0, digits)
@@ -38,6 +38,7 @@ class Exchange:
         self.bid_size = bid_size;
         self.sym1 = sym1
         self.sym2 = sym2
+        self.timestamp = time.time()
 
     def compare(self, ex):
         dif = self.bid - ex.ask
