@@ -44,8 +44,9 @@ class BotCrawler(Bot):
                     print("totally added", count, "deals this round")
                 except Exception as e:
                     print("error", str(e))
-                print("waiting...")
-                time.sleep(randint(60, 120))
+                r = randint(60, 120)
+                print("waiting", r, 'seconds...')
+                time.sleep(r)
         finally:
             self.__conn.close()
 
