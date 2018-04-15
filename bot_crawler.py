@@ -41,9 +41,10 @@ class BotCrawler(Bot):
             while True:
                 try:
                     count = analyzer.analyze(self.pairs, BotCrawler.progress_callback, self.__insert_records)
-                    print("totally added", count, "deals this round. Waiting...")
+                    print("totally added", count, "deals this round")
                 except Exception as e:
                     print("error", str(e))
+                print("waiting...")
                 time.sleep(randint(60, 120))
         finally:
             self.__conn.close()
