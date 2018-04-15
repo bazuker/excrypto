@@ -1,9 +1,11 @@
 import math
 import time
 
+
 def truncate(number, digits) -> float:
     stepper = pow(10.0, digits)
     return math.trunc(stepper * number) / stepper
+
 
 class ExchangeRate:
     def __init__(self, bid=None, ask=None, dif=None, size=None, sizemul=None, ex1=None, ex2=None):
@@ -14,6 +16,7 @@ class ExchangeRate:
         self.sizemul = sizemul;
         self.exchange1 = ex1
         self.exchange2 = ex2
+        self.timestamp = time.time()
 
     def is_profitable(self):
         return self.dif > 0
@@ -38,7 +41,6 @@ class Exchange:
         self.bid_size = bid_size;
         self.sym1 = sym1
         self.sym2 = sym2
-        self.timestamp = time.time()
 
     def compare(self, ex):
         dif = self.bid - ex.ask

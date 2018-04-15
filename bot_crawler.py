@@ -39,8 +39,11 @@ class BotCrawler(Bot):
         analyzer.load_markets()
         try:
             while True:
-                count = analyzer.analyze(self.pairs, BotCrawler.progress_callback, self.__insert_records)
-                print("totally added", count, "deals this round. Waiting...")
+                try:
+                    count = analyzer.analyze(self.pairs, BotCrawler.progress_callback, self.__insert_records)
+                    print("totally added", count, "deals this round. Waiting...")
+                except Exception as e:
+                    print("error", str(e))
                 time.sleep(randint(60, 120))
         finally:
             self.__conn.close()
