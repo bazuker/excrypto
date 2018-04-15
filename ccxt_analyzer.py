@@ -1,6 +1,5 @@
 import ccxt.async as ccxt
 import asyncio
-import sqlite3
 
 from dealer import Dealer
 
@@ -25,7 +24,7 @@ class DealAnalyzer:
         return g.id in self.markets and pair in self.markets[g.id]
 
     # analyzes the situation and returns the best deals
-    def compare_gateways(self, g1, g2, pairs, progress_callback):
+    def compare_gateways(self, g1, g2, pairs, progress_callback, deal_callback=None):
         pairs_len = len(pairs)
         if pairs is None or pairs_len == 0:
             return None
@@ -36,21 +35,24 @@ class DealAnalyzer:
         for p in pairs:
             # check if the pair is available for trading in the exchangers
             if not (self.pair_in_market(g1, p) and self.pair_in_market(g2, p)):
-                print(p, "is not in a market of", g1.id, '/', g2.id)
+                # print(p, "is not in a market of", g1.id, '/', g2.id)
                 continue
             # fetch the rates
             if not dealer.fetch_order_book(p):
                 continue
-            # update on progress
-            n += 1
-            if progress_callback(n, p, g1, g2, pairs_len):
-                return
             # find the deals based on retrieved data
             new_deals = dealer.produce_deals()
             if new_deals is None or len(new_deals) < 1:
                 continue
             else:
+                # call deal callback asap after producing the results
+                if deal_callback is not None:
+                    deal_callback(g1, g2, p, new_deals)
                 deals.extend(new_deals)
+            # update on progress
+            n += 1
+            if progress_callback(n, p, g1, g2, pairs_len):
+                return
             # sort by potential profit and return the result
         deals.sort(key=lambda x: x.sizemul, reverse=True)
         return deals
@@ -58,38 +60,20 @@ class DealAnalyzer:
     # look up for the best pairs across the gateways in the provided list
     # and saves them in the local database
     # returns amount of record added to the database
-    def analyze(self, pairs, progress_callback):
+    def analyze(self, pairs, progress_callback, comparison_callback, deal_callback=None):
         if pairs is None:
             return 0
         if self.markets is None:
             self.load_markets()
-        # create a local database
-        conn = sqlite3.connect('stocks.db')
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS stocks (time datetime, ex1 text, ex2 text, sym1 text, 
-sym2 text, bid real, ask real, size real, sizemul real)''')
         count = 0
-        try:
-            # start the analysis
-            for g1 in self.gateways:
-                for g2 in self.gateways:
-                    if g1.id != g2.id:
-                        t = []
-                        new_deals = []
-                        try:
-                            new_deals = self.compare_gateways(g1, g2, pairs, progress_callback)
-                        except ccxt.DDoSProtection as e:
-                            continue
-                        if new_deals is None or len(new_deals) < 1:
-                            continue
-                        for d in new_deals:
-                            ex1 = d.exchange1
-                            ex2 = d.exchange2
-                            tup = (ex1.identifier, ex2.identifier, ex1.sym1, ex1.sym2, d.bid, d.ask, d.size, d.sizemul)
-                            t.append(tup)
-                        c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?)', t)
-                        conn.commit()
+        # start the analysis
+        for g1 in self.gateways:
+            for g2 in self.gateways:
+                if g1.id != g2.id:
+                    try:
+                        new_deals = self.compare_gateways(g1, g2, pairs, progress_callback, deal_callback)
+                        comparison_callback(g1, g2, new_deals)
                         count += len(new_deals)
-        finally:
-            conn.close()
+                    except ccxt.DDoSProtection:
+                        continue
         return count
