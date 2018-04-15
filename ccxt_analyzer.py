@@ -47,7 +47,7 @@ class DealAnalyzer:
             else:
                 # call deal callback asap after producing the results
                 if deal_callback is not None:
-                    deal_callback(g1, g2, p, new_deals)
+                    deal_callback(new_deals)
                 deals.extend(new_deals)
             # update on progress
             n += 1
@@ -72,7 +72,7 @@ class DealAnalyzer:
                 if g1.id != g2.id:
                     try:
                         new_deals = self.compare_gateways(g1, g2, pairs, progress_callback, deal_callback)
-                        comparison_callback(g1, g2, new_deals)
+                        comparison_callback(new_deals)
                         count += len(new_deals)
                     except ccxt.DDoSProtection:
                         continue

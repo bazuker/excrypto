@@ -20,7 +20,7 @@ class BotCrawler(Bot):
         self.__c.execute('''CREATE TABLE IF NOT EXISTS stocks (time datetime, ex1 text, ex2 text, sym1 text, 
         sym2 text, bid real, ask real, size real, sizemul real)''')
 
-    def __insert_records(self, g1, g2, new_deals):
+    def __insert_records(self, new_deals):
         if new_deals is None or len(new_deals) < 1:
             return
         t = []
