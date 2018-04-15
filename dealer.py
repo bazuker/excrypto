@@ -29,11 +29,11 @@ async def fetch_order_books_async(symbol, g):
     try:
         data_cache[gid] = await convert_fetch(symbol, g)
     except ccxt.ExchangeError as e:
-        print(e)
+        print('exchange error', e)
         if g.id in data_cache:
             del data_cache[gid]
     except ccxt.RequestTimeout as e:
-        print(e)
+        print('timeout', e)
         if g.id in data_cache:
             del data_cache[gid]
 

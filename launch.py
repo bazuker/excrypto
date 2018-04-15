@@ -10,7 +10,7 @@ bittrex = ccxt.bittrex()
 exmo = ccxt.exmo()
 liqui = ccxt.liqui()
 # group them together
-gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo, liqui]
+gateways = [hitbtc, binance, kucoin, poloniex, bittrex, exmo]
 # define pairs for analysis
 pairs = ['BCH/USDT', 'BTC/USDT', 'LTC/USDT']
 # run the bot
