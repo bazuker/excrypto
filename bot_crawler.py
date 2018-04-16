@@ -18,7 +18,7 @@ class BotCrawler(Bot):
         self.__conn = sqlite3.connect('stocks.db')
         self.__c = self.__conn.cursor()
         self.__c.execute('''CREATE TABLE IF NOT EXISTS stocks (time datetime, ex1 text, ex2 text, sym1 text, 
-        sym2 text, bid real, ask real, size real, sizemul real)''')
+        sym2 text, bid real, ask real, size real, sizemul real, fallback boolean)''')
 
     def __insert_records(self, new_deals):
         if new_deals is None or len(new_deals) < 1:
@@ -27,9 +27,10 @@ class BotCrawler(Bot):
         for d in new_deals:
             ex1 = d.exchange1
             ex2 = d.exchange2
-            tup = (ex1.identifier, ex2.identifier, ex1.sym1, ex1.sym2, d.bid, d.ask, d.size, d.sizemul)
+            tup = (ex1.identifier, ex2.identifier, ex1.sym1, ex1.sym2,
+                   d.bid, d.ask, d.size, d.sizemul, d.can_fallback())
             t.append(tup)
-        self.__c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?)', t)
+        self.__c.executemany('INSERT INTO stocks VALUES(datetime(),?,?,?,?,?,?,?,?,?)', t)
         self.__conn.commit()
 
     def run(self):

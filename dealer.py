@@ -1,6 +1,7 @@
 from functools import partial
 
 from exchange_data import Exchange
+from exchange_data import ExchangeOrder
 
 import ccxt.async as ccxt
 import asyncio
@@ -9,15 +10,21 @@ import asyncio
 data_cache = {}
 
 
-def convert_ccxt_order_book(gateway, sym, orderbook):
+def convert_ccxt_order_book(gateway, sym, order_book, limit=3):
     symbols = [x.strip() for x in sym.split('/')]
-    asks = orderbook['asks'][0]
-    bids = orderbook['bids'][0]
-    ask_price = asks[0]
-    ask_size = asks[1]
-    bid_price = bids[0]
-    bid_size = bids[1]
-    return Exchange(gateway.id, ask_price, ask_size, bid_price, bid_size, symbols[0], symbols[1], gateway)
+    asks = order_book['asks']
+    bids = order_book['bids']
+    m_len = min(len(asks), len(bids))
+    orders = []
+    n = 0
+    for i in range(0, m_len):
+        n += 1
+        b = bids[i]
+        a = asks[i]
+        orders.append(ExchangeOrder(b[0], b[1], a[0], a[1]))
+        if n == limit:
+            break
+    return Exchange(gateway.id, orders, symbols[0], symbols[1], gateway)
 
 
 async def convert_fetch(symbol, g):

@@ -1,5 +1,17 @@
-SELECT sum(sizemul) FROM stocks WHERE sym1='LTC' AND sym2='USDT' AND size < 10 AND sizemul > 15
+SELECT sum(sizemul) FROM stocks 
+WHERE sym1='LTC' AND sym2='USDT' AND size < 10 AND sizemul > 15
 
-select * from stocks where ex2='exmo' and sym2='USDT' and sizemul > 3 order by sizemul desc
+SELECT * FROM stocks 
+WHERE ex2='exmo' AND sym2='USDT' AND sizemul > 3 
+ORDER BY sizemul desc
 
-select sum(sizemul) from stocks where sym2='USDT' and sizemul > 5 and size <= 0.1 order by sizemul desc
+SELECT avg(sizemul) FROM stocks 
+WHERE strftime('%s', time) BETWEEN strftime('%s', '2018-04-15 00:00:01') AND strftime('%s', datetime())
+AND sym2='USDT' AND sizemul > 5 AND size <= 0.1 
+ORDER BY sizemul DESC
+
+SELECT sum(sizemul), sum(size) FROM stocks 
+WHERE strftime('%s', time) BETWEEN strftime('%s', '2018-04-15 00:00:01') AND strftime('%s', datetime())
+AND sym1='BTC' AND sym2='USDT' 
+AND sizemul > 5 AND size <= 0.1 
+ORDER BY sizemul DESC

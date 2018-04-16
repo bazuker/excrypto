@@ -45,7 +45,7 @@ class DealAnalyzer:
             if new_deals is None or len(new_deals) < 1:
                 continue
             else:
-                # call deal callback asap after producing the results
+                # call the deal callback asap after producing the results
                 if deal_callback is not None:
                     deal_callback(new_deals)
                 deals.extend(new_deals)
