@@ -19,4 +19,3 @@ class Bot:
             Bot.clean_print(g1.id, "/", g2.id)
         print(n, 'out of', total, '|', p)
         time.sleep(0.05)
-        return False  # continue

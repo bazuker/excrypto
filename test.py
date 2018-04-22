@@ -1,58 +1,47 @@
-import matplotlib.pyplot as plt
 import ccxt
 
-pair = 'BTC/USDT'
-exchanges = [ccxt.hitbtc(), ccxt.binance(), ccxt.exmo(), ccxt.liqui(),
-             ccxt.kucoin(), ccxt.poloniex(), ccxt.bittrex()]
 
-
-def percentage(percent, whole) -> float:
-    return (percent * whole) / 100.0
-
-
-def display_ticker(g, p):
-    bid = 0
-    volume = 0
-    try:
-        t = g.fetch_ticker(p)
-        bid = float(t['bid'])
-        volume = float(t['baseVolume'])
-        plt.annotate(g.id, (bid, volume))
-    except ccxt.ExchangeError as e:
-        print(str(e))
-    except KeyError as e:
-        print('pair', str(e), 'not available for', g.id)
-    return bid, volume
-
-
-def display_plot(gateways, p):
-    plt.title(p)
-    plt.xlabel('price')
-    plt.ylabel('base volume')
-    prices = []
-    volumes = []
-    for g in gateways:
-        t = display_ticker(g, p)
-        if t[0] == 0:
+def calc_transfer_cost(g1, g2, cur, lot_price=1):
+    g1.load_markets()
+    g2.load_markets()
+    # match currencies
+    pairs = []
+    dic = {}
+    for p in g1.symbols:
+        dic[p] = 1
+    for p in g2.symbols:
+        if p in dic and cur in p:
+            pairs.append(p)
+    costs = []
+    for p in pairs:
+        sym1 = p[:3]
+        orders1 = g1.fetch_order_book(p)
+        orders2 = g2.fetch_order_book(p)
+        g1_desc = g1.describe()
+        g2_desc = g2.describe()
+        g1_fees = g1_desc['fees']['funding']['withdraw']
+        g2_fees = g1_desc['fees']['funding']['deposit']
+        if not (sym1 in g1_fees and sym1 in g2_fees):
             continue
-        print(g.id, t[0])
-        prices.append(t[0])
-        volumes.append(t[1])
-        plt.scatter(t[0], t[1])
-        plt.annotate(g.id, (t[0], t[1]))
-    prices.sort(reverse=True)
-    volumes.sort(reverse=True)
-    max1 = float(prices[0])
-    max2 = float(volumes[0])
-    min1 = float(prices[len(prices)-1])
-    min2 = float(volumes[len(prices)-1])
-    top1 = float(max1 + percentage(10.0, max1))
-    top2 = float(max2 + percentage(10.0, max2))
-    low1 = float(min1 - percentage(5.0, min1))
-    low2 = float(min2 - percentage(5.0, min2))
-    plt.axis([low1, top1, low2, top2])
-    plt.show()
+        trading_fee1 = g1_desc['fees']['trading']['taker']
+        trading_fee2 = g2_desc['fees']['trading']['taker']
+        withdrawal_fee = g1_fees[sym1]
+        deposit_fee = g2_fees[sym1]
+        ask = orders1['asks'][0][0]
+        buy_fee = 0#trading_fee1 * lot_price
+        bid = orders2['bids'][0][0]
+        transfer_amount = lot_price - buy_fee - withdrawal_fee
+        sell_fee = 0#trading_fee2 * transfer_amount
+        result = (((transfer_amount - sell_fee - deposit_fee) / ask) * bid) - lot_price
+        t = p, result
+        costs.append(t)
+    costs.sort(key=lambda x: x[1], reverse=True)
+    return costs
 
 
-print("plotting...")
-display_plot(exchanges, pair)
+
+
+
+d = calc_transfer_cost(ccxt.kraken(), ccxt.binance(), "XRP", 5877)
+print(d)
+print("end")

@@ -28,15 +28,17 @@ class ExchangeRate:
         self.size_fallback = fallback_comparison_result[3]
         self.sizemul = comparison_result[4]
         self.sizemul_fallback = fallback_comparison_result[4]
+        self.profit = self.sizemul / (self.bid * self.size)
+        self.profit_fallback = self.sizemul_fallback / (self.bid_fallback * self.size)
         self.exchange1 = exchanger1
         self.exchange2 = exchanger2
         self.timestamp = time.time()
 
     def is_profitable(self):
-        return self.dif > 0
+        return self.sizemul > 0
 
     def can_fallback(self):
-        return self.dif_fallback > 0
+        return self.sizemul_fallback > 0
 
     def print(self):
         print("bid", "{0:.15f}".format(round(self.bid, 15)))
@@ -47,24 +49,35 @@ class ExchangeRate:
             print("dif", "{0:.15f}".format(round(self.dif, 15)))
             print("size", "{0:.15f}".format(round(self.size, 15)))
             print("sizemul", "{0:.15f}".format(round(self.sizemul, 15)))
+            print("profit", "{0:.15f}".format(round(self.profit, 15)))
         if self.can_fallback():
             print("dif_fallback", "{0:.15f}".format(round(self.dif_fallback, 15)))
             print("size_fallback", "{0:.15f}".format(round(self.size_fallback, 15)))
             print("sizemul_fallback", "{0:.15f}".format(round(self.sizemul_fallback, 15)))
+            print("profit_fallback", "{0:.15f}".format(round(self.profit_fallback, 15)))
 
 
 class Exchange:
-    def __init__(self, identifier=None, orders=None, sym1=None, sym2=None, gateway=None):
+    def __init__(self, identifier=None, orders=None, sym1=None, sym2=None, gateway=None, fee=None):
         self.identifier = identifier  # exchanger api identifier
         self.gateway = gateway  # exchanger api gateway
         self.orders = orders
         self.sym1 = sym1
         self.sym2 = sym2
+        self.fee = fee
 
-    def __compare(self, self_order, ex_order):
+    def __compare(self, self_order, ex_order, ex_fee):
+        # difference in ask/bid between two exchanges
         dif = self_order.bid - ex_order.ask
+        # minimal trading size
         min_size = min(self_order.bid_size, ex_order.ask_size)
-        sizemul = truncate(min_size * dif, 14)
+        # deal's total
+        delta = min_size * dif
+        # subtract fees
+        fee = float(self_order.bid * self.fee) + float(ex_order.ask * ex_fee)
+        delta -= fee
+        # potential profit
+        sizemul = truncate(delta, 14)
         return self_order.bid, ex_order.ask, dif, min_size, sizemul
 
     def compare(self, ex):
@@ -72,12 +85,12 @@ class Exchange:
         self_order1 = self.orders[0]
         ex_order1 = ex.orders[0]
         # calculate profitability
-        result = self.__compare(self_order1, ex_order1)
+        result = self.__compare(self_order1, ex_order1, ex.fee)
         # get the second top order
         self_order2 = self.orders[1]
         ex_order2 = ex.orders[1]
         # calculate the fallback profitability
-        fallback_result = self.__compare(self_order2, ex_order2)
+        fallback_result = self.__compare(self_order2, ex_order2, ex.fee)
         # produce the exchange rate
         return ExchangeRate(result, fallback_result, self, ex)
 
