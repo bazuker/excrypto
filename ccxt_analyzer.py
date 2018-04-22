@@ -1,7 +1,7 @@
 import ccxt.async as ccxt
-import asyncio
 
 from dealer import Dealer
+from helper import async_list_task
 
 
 async def load_markets_async(g):
@@ -61,10 +61,7 @@ class DealAnalyzer:
                 load = True
                 break
         if load:
-            loop = asyncio.get_event_loop()
-            [asyncio.ensure_future(load_markets_async(g)) for g in self.gateways]
-            pending = asyncio.Task.all_tasks()
-            loop.run_until_complete(asyncio.gather(*pending))
+            async_list_task(load_markets_async, self.gateways)
         # load fees
         if self.taker_fees is None:
             self.taker_fees = {}

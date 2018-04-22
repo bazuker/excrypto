@@ -2,9 +2,9 @@ from functools import partial
 
 from exchange_data import Exchange
 from exchange_data import ExchangeOrder
+from helper import async_list_task
 
 import ccxt.async as ccxt
-import asyncio
 
 
 class Dealer:
@@ -50,11 +50,8 @@ class Dealer:
                 del self.data_cache[gid]
 
     def fetch_order_book(self, symbol):
-        loop = asyncio.get_event_loop()
         fetch_async = partial(self.fetch_order_books_async, symbol)
-        [asyncio.ensure_future(fetch_async(g)) for g in [self.g1, self.g2]]
-        pending = asyncio.Task.all_tasks()
-        loop.run_until_complete(asyncio.gather(*pending))
+        async_list_task(fetch_async, [self.g1, self.g2])
         gid1 = self.g1.id + symbol
         gid2 = self.g2.id + symbol
         if gid1 in self.data_cache and gid2 in self.data_cache:

@@ -1,18 +1,18 @@
-import asyncio
 import ccxt.async as ccxt
 from bot_crawler import BotCrawler
+from helper import NoInternetException
 
 if __name__ == '__main__':
     # initialize exchangers instances
-    hitbtc = ccxt.hitbtc()
+    # hitbtc = ccxt.hitbtc()
+    # kucoin = ccxt.kucoin()
+    # liqui = ccxt.liqui()
+    # huobi = ccxt.huobi()
     binance = ccxt.binance()
-    kucoin = ccxt.kucoin()
     poloniex = ccxt.poloniex()
     bittrex = ccxt.bittrex()
     exmo = ccxt.exmo()
-    liqui = ccxt.liqui()
     kraken = ccxt.kraken()
-    huobi = ccxt.huobi()
     cex = ccxt.cex()
     bitfinex = ccxt.bitfinex2()
     # group them together
@@ -25,24 +25,8 @@ if __name__ == '__main__':
         crawler.run()
     except KeyboardInterrupt:
         print('stop.')
+    except NoInternetException:
+        print('Connect to the Internet to run the program!')
+    finally:
+        crawler.stop()
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

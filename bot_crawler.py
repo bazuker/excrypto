@@ -4,6 +4,8 @@ import sqlite3
 from random import randint
 from ccxt_analyzer import DealAnalyzer
 from bot import Bot
+from helper import internet
+from helper import async_list_task
 
 
 class BotCrawler(Bot):
@@ -12,6 +14,12 @@ class BotCrawler(Bot):
         super(BotCrawler, self).__init__(gateways, pairs)
         self.__conn = None
         self.__c = None
+
+    async def __stop_async(self, g):
+        await g.close()
+
+    def stop(self):
+        async_list_task(self.__stop_async, self.gateways)
 
     def __init_database(self):
         # create a local database
@@ -37,7 +45,12 @@ class BotCrawler(Bot):
             print("database error:", str(e))
 
     def run(self):
+        # verify the Internet connection
+        # if not connected raises an error
+        internet()
+        # initialize the sqlite database
         self.__init_database()
+        # initialize the analyzer for the specified exchangers
         analyzer = DealAnalyzer(self.gateways)
         print('loading markets...')
         try:
