@@ -1,10 +1,6 @@
-import math
 import time
 
-
-def truncate(number, digits) -> float:
-    stepper = pow(10.0, digits)
-    return math.trunc(stepper * number) / stepper
+from helper import truncate
 
 
 class ExchangeOrder:

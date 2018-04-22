@@ -1,3 +1,4 @@
+import math
 import socket
 import asyncio
 
@@ -22,3 +23,8 @@ def async_list_task(method, collection):
     [asyncio.ensure_future(method(x)) for x in collection]
     pending = asyncio.Task.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
+
+
+def truncate(number, digits) -> float:
+    stepper = pow(10.0, digits)
+    return math.trunc(stepper * number) / stepper

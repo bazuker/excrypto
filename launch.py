@@ -8,15 +8,15 @@ if __name__ == '__main__':
     # kucoin = ccxt.kucoin()
     # liqui = ccxt.liqui()
     # huobi = ccxt.huobi()
+    # exmo = ccxt.exmo()
     binance = ccxt.binance()
     poloniex = ccxt.poloniex()
     bittrex = ccxt.bittrex()
-    exmo = ccxt.exmo()
     kraken = ccxt.kraken()
     cex = ccxt.cex()
     bitfinex = ccxt.bitfinex2()
     # group them together
-    gateways = [cex, binance, poloniex, bittrex, kraken, bitfinex, exmo]
+    gateways = [cex, binance, poloniex, bittrex, kraken, bitfinex]
     # define pairs for analysis
     pairs = ['XRP/BTC', 'XLM/BTC']
     # run the bot
@@ -27,6 +27,4 @@ if __name__ == '__main__':
         print('stop.')
     except NoInternetException:
         print('Connect to the Internet to run the program!')
-    finally:
-        crawler.stop()
 

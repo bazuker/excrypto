@@ -1,11 +1,10 @@
 import time
 import sqlite3
+import helper
 
 from random import randint
 from ccxt_analyzer import DealAnalyzer
 from bot import Bot
-from helper import internet
-from helper import async_list_task
 
 
 class BotCrawler(Bot):
@@ -14,12 +13,16 @@ class BotCrawler(Bot):
         super(BotCrawler, self).__init__(gateways, pairs)
         self.__conn = None
         self.__c = None
+        self.__running = False
 
-    async def __stop_async(self, g):
+    @staticmethod
+    async def close_gateway_async(g):
         await g.close()
 
     def stop(self):
-        async_list_task(self.__stop_async, self.gateways)
+        if self.__running:
+            self.__running = False
+            helper.async_list_task(BotCrawler.close_gateway_async, self.gateways)
 
     def __init_database(self):
         # create a local database
@@ -47,19 +50,24 @@ class BotCrawler(Bot):
     def run(self):
         # verify the Internet connection
         # if not connected raises an error
-        internet()
+        helper.internet()
         # initialize the sqlite database
         self.__init_database()
         # initialize the analyzer for the specified exchangers
         analyzer = DealAnalyzer(self.gateways)
         print('loading markets...')
         try:
-            while True:
+            self.__running = True
+            while self.__running:
+                start_time = time.time()
                 count = analyzer.analyze(self.pairs, BotCrawler.progress_callback, self.__insert_records)
-                print("totally added", count, "deals this round")
+                elapsed_time = helper.truncate(time.time() - start_time, 2)
+                self.clean_print("elapsed time is", elapsed_time, "seconds")
+                print("detected", count, "deals this round")
                 r = randint(60, 120)
                 print("waiting", r, 'seconds...')
                 time.sleep(r)
         finally:
+            self.stop()
             self.__conn.close()
 
