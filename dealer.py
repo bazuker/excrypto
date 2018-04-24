@@ -36,18 +36,23 @@ class Dealer:
     async def convert_fetch(self, symbol, g):
         return self.convert_ccxt_order_book(g, symbol, await g.fetch_order_book(symbol))
 
+    def del_cache(self, gid):
+        if gid in self.data_cache:
+            del self.data_cache[gid]
+
     async def fetch_order_books_async(self, symbol, g):
         gid = g.id + symbol
         try:
             self.data_cache[gid] = await self.convert_fetch(symbol, g)
         except ccxt.ExchangeError as e:
             print('exchange error', e)
-            if g.id in self.data_cache:
-                del self.data_cache[gid]
-        except ccxt.RequestTimeout as e:
+            self.del_cache(gid)
+        except ccxt.ExchangeNotAvailable as e:
+            print('exchange unavailable', e)
+            self.del_cache(gid)
+        except TimeoutError as e:
             print('timeout', e)
-            if g.id in self.data_cache:
-                del self.data_cache[gid]
+            self.del_cache(gid)
 
     def fetch_order_book(self, symbol):
         fetch_async = partial(self.fetch_order_books_async, symbol)
