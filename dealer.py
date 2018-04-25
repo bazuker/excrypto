@@ -50,7 +50,7 @@ class Dealer:
         except ccxt.ExchangeNotAvailable as e:
             print('exchange unavailable', e)
             self.del_cache(gid)
-        except TimeoutError as e:
+        except ccxt.RequestTimeout as e:
             print('timeout', e)
             self.del_cache(gid)
 
