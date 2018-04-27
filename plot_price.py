@@ -1,9 +1,16 @@
 import matplotlib.pyplot as plt
 import ccxt
 
-pair = 'BCH/BTC'
-exchanges = [ccxt.binance(), ccxt.exmo(), ccxt.liqui(), ccxt.bitstamp(), ccxt.liqui(),
-             ccxt.kucoin(), ccxt.poloniex(), ccxt.bittrex(), ccxt.huobi(), ccxt.kraken()]
+pair = 'XRP/BTC'
+binance = ccxt.binance()
+poloniex = ccxt.poloniex()
+bittrex = ccxt.bittrex()
+kraken = ccxt.kraken()
+cex = ccxt.cex()
+bitfinex = ccxt.bitfinex2()
+# group them together
+exchanges = [cex, binance, poloniex, bittrex, kraken, bitfinex]
+
 
 def percentage(percent, whole) -> float:
     return (percent * whole) / 100.0
@@ -45,8 +52,8 @@ def display_plot(gateways, p):
     max2 = float(volumes[0])
     min1 = float(prices[len(prices)-1])
     min2 = float(volumes[len(prices)-1])
-    top1 = float(max1 + percentage(10.0, max1))
-    top2 = float(max2 + percentage(10.0, max2))
+    top1 = float(max1 + percentage(5.0, max1))
+    top2 = float(max2 + percentage(5.0, max2))
     low1 = float(min1 - percentage(5.0, min1))
     low2 = float(min2 - percentage(5.0, min2))
     plt.axis([low1, top1, low2, top2])

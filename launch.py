@@ -4,10 +4,11 @@ from helper import NoInternetException
 
 if __name__ == '__main__':
     # initialize exchangers instances
-    # hitbtc = ccxt.hitbtc()
+   #  hitbtc = ccxt.hitbtc2()
     # kucoin = ccxt.kucoin()
     # liqui = ccxt.liqui()
-    # huobi = ccxt.huobi()
+    huobi = ccxt.huobi()
+    # bitmex = ccxt.bitmex()
     # exmo = ccxt.exmo()
     binance = ccxt.binance()
     poloniex = ccxt.poloniex()

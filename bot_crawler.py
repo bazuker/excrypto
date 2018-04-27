@@ -64,7 +64,7 @@ class BotCrawler(Bot):
                 elapsed_time = helper.truncate(time.time() - start_time, 2)
                 self.clean_print("elapsed time is", elapsed_time, "seconds")
                 print("detected", count, "deals this round")
-                r = randint(60, 120)
+                r = randint(int(elapsed_time * 2), int(elapsed_time * 4)) + 2
                 print("waiting", r, 'seconds...')
                 time.sleep(r)
         finally:

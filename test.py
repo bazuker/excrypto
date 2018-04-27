@@ -1,6 +1,8 @@
 import ccxt
 
+from helper import truncate
 
+"""
 def calc_transfer_cost(g1, g2, cur, lot_price=1):
     g1.load_markets()
     g2.load_markets()
@@ -18,30 +20,40 @@ def calc_transfer_cost(g1, g2, cur, lot_price=1):
         orders1 = g1.fetch_order_book(p)
         orders2 = g2.fetch_order_book(p)
         g1_desc = g1.describe()
-        g2_desc = g2.describe()
         g1_fees = g1_desc['fees']['funding']['withdraw']
         g2_fees = g1_desc['fees']['funding']['deposit']
         if not (sym1 in g1_fees and sym1 in g2_fees):
             continue
-        trading_fee1 = g1_desc['fees']['trading']['taker']
-        trading_fee2 = g2_desc['fees']['trading']['taker']
         withdrawal_fee = g1_fees[sym1]
         deposit_fee = g2_fees[sym1]
         ask = orders1['asks'][0][0]
-        buy_fee = 0#trading_fee1 * lot_price
         bid = orders2['bids'][0][0]
-        transfer_amount = lot_price - buy_fee - withdrawal_fee
-        sell_fee = 0#trading_fee2 * transfer_amount
-        result = (((transfer_amount - sell_fee - deposit_fee) / ask) * bid) - lot_price
+        transfer_amount = lot_price - withdrawal_fee
+        result = (((transfer_amount - deposit_fee) / ask) * bid) - lot_price
         t = p, result
         costs.append(t)
     costs.sort(key=lambda x: x[1], reverse=True)
     return costs
+"""
 
-
-
-
-
-d = calc_transfer_cost(ccxt.kraken(), ccxt.binance(), "XRP", 5877)
-print(d)
-print("end")
+btc_xrp = 0.00009
+xrp_usd = 0.794343
+avg_sizemul = 0.000124660458612618
+avg_size = 1079.3715694549
+g1 = ccxt.kraken()
+g2 = ccxt.binance()
+g1_desc = g1.describe()
+g2_desc = g2.describe()
+g1_fees = g1_desc['fees']['funding']['withdraw']['XRP']
+g2_fees = 0  # g2_desc['fees']['funding']['deposit']['XRP']   0 for binance
+g1_fees_back = g1_desc['fees']['funding']['deposit']['BTC']
+g2_fees_back = g2_desc['fees']['funding']['withdraw']['BTC']
+xrp_transfer_fee = g1_fees + g2_fees
+btc_transfer_fee = g1_fees_back + g2_fees_back
+print(xrp_transfer_fee, 'XRP =>')
+print(btc_transfer_fee, 'BTC <=')
+min_deposit = (btc_transfer_fee / avg_sizemul) * avg_size
+print("minimal required deposit")
+print(truncate(min_deposit, 3), 'XRP')
+print(truncate(min_deposit * btc_xrp, 3), 'BTC')
+print(truncate(min_deposit * xrp_usd, 3), 'USD')
