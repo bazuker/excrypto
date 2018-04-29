@@ -7,7 +7,7 @@ if __name__ == '__main__':
    #  hitbtc = ccxt.hitbtc2()
     # kucoin = ccxt.kucoin()
     # liqui = ccxt.liqui()
-    huobi = ccxt.huobi()
+    # huobi = ccxt.huobi()
     # bitmex = ccxt.bitmex()
     # exmo = ccxt.exmo()
     binance = ccxt.binance()
@@ -28,4 +28,3 @@ if __name__ == '__main__':
         print('stop.')
     except NoInternetException:
         print('Connect to the Internet to run the program!')
-

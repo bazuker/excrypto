@@ -35,12 +35,17 @@ def calc_transfer_cost(g1, g2, cur, lot_price=1):
     costs.sort(key=lambda x: x[1], reverse=True)
     return costs
 """
+# 5 hours
+# 0.20523526338273 BTC
+#  942270.54058755 size
 
-btc_xrp = 0.00009
-xrp_usd = 0.794343
+btc_xrp = 0.0000956
+xrp_usd = 0.894343
+btc_rate = 0.041047053  # per hour
+size_rate = 188454.1 * xrp_usd
 avg_sizemul = 0.000124660458612618
 avg_size = 1079.3715694549
-g1 = ccxt.kraken()
+g1 = ccxt.bitfinex2()
 g2 = ccxt.binance()
 g1_desc = g1.describe()
 g2_desc = g2.describe()
@@ -48,12 +53,16 @@ g1_fees = g1_desc['fees']['funding']['withdraw']['XRP']
 g2_fees = 0  # g2_desc['fees']['funding']['deposit']['XRP']   0 for binance
 g1_fees_back = g1_desc['fees']['funding']['deposit']['BTC']
 g2_fees_back = g2_desc['fees']['funding']['withdraw']['BTC']
-xrp_transfer_fee = g1_fees + g2_fees
+xrp_transfer_fee = (g1_fees + g2_fees) * btc_xrp
 btc_transfer_fee = g1_fees_back + g2_fees_back
-print(xrp_transfer_fee, 'XRP =>')
+total_fee = xrp_transfer_fee + btc_transfer_fee
+print(xrp_transfer_fee, 'XRP in BTC =>')
 print(btc_transfer_fee, 'BTC <=')
-min_deposit = (btc_transfer_fee / avg_sizemul) * avg_size
+min_deposit = (total_fee / avg_sizemul) * avg_size
 print("minimal required deposit")
 print(truncate(min_deposit, 3), 'XRP')
 print(truncate(min_deposit * btc_xrp, 3), 'BTC')
 print(truncate(min_deposit * xrp_usd, 3), 'USD')
+print()
+daily_profit_usd =(((btc_rate - total_fee) * 24 *  9339)/100) * 30
+print(daily_profit_usd, "USD")
