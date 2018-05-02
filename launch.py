@@ -4,7 +4,7 @@ from helper import NoInternetException
 
 if __name__ == '__main__':
     # initialize exchangers instances
-   #  hitbtc = ccxt.hitbtc2()
+    # hitbtc = ccxt.hitbtc2()
     # kucoin = ccxt.kucoin()
     # liqui = ccxt.liqui()
     # huobi = ccxt.huobi()

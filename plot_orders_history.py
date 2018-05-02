@@ -21,7 +21,7 @@ def quick_plot_from_sql(set1, set2, title='X/Y', xlb='X', ylb='Y'):
 
 conn = sqlite3.connect('stocks.db')
 c = conn.cursor()
-sql = "select size, sizemul from stocks where sym1='XRP'"
+sql = "select size, sizemul from stocks where sym1='XLM'"
 c.execute(sql)
 result = c.fetchall()
 set1, set2 = zip(*result)

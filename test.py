@@ -64,5 +64,5 @@ print(truncate(min_deposit, 3), 'XRP')
 print(truncate(min_deposit * btc_xrp, 3), 'BTC')
 print(truncate(min_deposit * xrp_usd, 3), 'USD')
 print()
-daily_profit_usd =(((btc_rate - total_fee) * 24 *  9339)/100) * 30
-print(daily_profit_usd, "USD")
+daily_profit = (((btc_rate - total_fee) * 17)/100) * 30
+print(daily_profit, "BTC")
