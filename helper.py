@@ -25,6 +25,14 @@ def async_list_task(method, collection):
     loop.run_until_complete(asyncio.gather(*pending))
 
 
+async def __load_markets_async(g):
+    return await g.load_markets()
+
+
+def load_markets(gateways):
+    async_list_task(__load_markets_async, gateways)
+
+
 def truncate(number, digits) -> float:
     stepper = pow(10.0, digits)
     return math.trunc(stepper * number) / stepper

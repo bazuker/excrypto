@@ -2,14 +2,7 @@ import matplotlib.pyplot as plt
 import ccxt
 
 pair = 'XRP/BTC'
-binance = ccxt.binance()
-poloniex = ccxt.poloniex()
-bittrex = ccxt.bittrex()
-kraken = ccxt.kraken()
-cex = ccxt.cex()
-bitfinex = ccxt.bitfinex2()
-# group them together
-exchanges = [cex, binance, poloniex, bittrex, kraken, bitfinex]
+gateways = [ccxt.cex(), ccxt.poloniex(), ccxt.binance(), ccxt.kraken(), ccxt.bitfinex2()]
 
 
 def percentage(percent, whole) -> float:
@@ -61,4 +54,4 @@ def display_plot(gateways, p):
 
 
 print("plotting...")
-display_plot(exchanges, pair)
+display_plot(gateways, pair)

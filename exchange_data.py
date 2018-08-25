@@ -24,11 +24,10 @@ class ExchangeRate:
         self.size_fallback = fallback_comparison_result[3]
         self.sizemul = comparison_result[4]
         self.sizemul_fallback = fallback_comparison_result[4]
-        self.profit = self.sizemul / (self.bid * self.size)
-        self.profit_fallback = self.sizemul_fallback / (self.bid_fallback * self.size)
         self.exchange1 = exchanger1
         self.exchange2 = exchanger2
         self.timestamp = time.time()
+        self.profit_rate = 0.0  # to be set
 
     def is_profitable(self):
         return self.sizemul > 0
@@ -45,12 +44,10 @@ class ExchangeRate:
             print("dif", "{0:.15f}".format(round(self.dif, 15)))
             print("size", "{0:.15f}".format(round(self.size, 15)))
             print("sizemul", "{0:.15f}".format(round(self.sizemul, 15)))
-            print("profit", "{0:.15f}".format(round(self.profit, 15)))
         if self.can_fallback():
             print("dif_fallback", "{0:.15f}".format(round(self.dif_fallback, 15)))
             print("size_fallback", "{0:.15f}".format(round(self.size_fallback, 15)))
             print("sizemul_fallback", "{0:.15f}".format(round(self.sizemul_fallback, 15)))
-            print("profit_fallback", "{0:.15f}".format(round(self.profit_fallback, 15)))
 
 
 class Exchange:
@@ -68,12 +65,12 @@ class Exchange:
         # minimal trading size
         min_size = min(self_order.bid_size, ex_order.ask_size)
         # deal's total
-        delta = min_size * dif
+        raw_sizemul = min_size * dif
         # subtract fees
         fee = float(self_order.bid * self.fee) + float(ex_order.ask * ex_fee)
-        delta -= fee
+        raw_sizemul -= fee
         # potential profit
-        sizemul = truncate(delta, 14)
+        sizemul = truncate(raw_sizemul, 14)
         return self_order.bid, ex_order.ask, dif, min_size, sizemul
 
     def compare(self, ex):
@@ -89,6 +86,15 @@ class Exchange:
         fallback_result = self.__compare(self_order2, ex_order2, ex.fee)
         # produce the exchange rate
         return ExchangeRate(result, fallback_result, self, ex)
+
+    def get_trading_fee(self, ex):
+        return float(self.orders[0].bid * self.fee) + float(ex.orders[0].ask * ex.fee)
+
+    def can_compare(self, ex):
+        return self.identifier != ex.identifier and self.sym1 == ex.sym1 and self.sym2 == ex.sym2
+
+    def get_pair_symbol(self):
+        return self.sym1 + '/' + self.sym2
 
     def print(self):
         print("identifier", self.identifier)

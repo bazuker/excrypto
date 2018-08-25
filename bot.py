@@ -14,8 +14,6 @@ class Bot:
         print(*args)
 
     @staticmethod
-    def progress_callback(n, p, g1, g2, total):
-        if n == 1:
-            Bot.clean_print(g1.id, "/", g2.id)
-        print(n, 'out of', total, '|', p)
+    def progress_callback(g1, g2, temp_deals):
+        Bot.clean_print(g1.id, "/", g2.id + "...", len(temp_deals))
         time.sleep(0.05)

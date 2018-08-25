@@ -2,6 +2,8 @@ import ccxt
 
 from helper import truncate
 
+from orders_history_database import OrdersHistoryDatabase
+
 """
 def calc_transfer_cost(g1, g2, cur, lot_price=1):
     g1.load_markets()
@@ -34,7 +36,7 @@ def calc_transfer_cost(g1, g2, cur, lot_price=1):
         costs.append(t)
     costs.sort(key=lambda x: x[1], reverse=True)
     return costs
-"""
+
 # 5 hours
 # 0.20523526338273 BTC
 #  942270.54058755 size
@@ -66,3 +68,31 @@ print(truncate(min_deposit * xrp_usd, 3), 'USD')
 print()
 daily_profit = (((btc_rate - total_fee) * 17)/100) * 30
 print(daily_profit, "BTC")
+"""
+names = ['binance', 'poloniex', 'kraken', 'cex']
+db = OrdersHistoryDatabase('stocks')
+
+
+def estimate(d):
+    sql = "select avg(profit), avg(sizemul), avg(size) from stocks where sym1='XRP' and ex1='" + d[0] + "' and ex2='" + d[1] + "';"
+    result = db.execute_sql(sql)
+    print('\tprofit', result[0][0])
+    print('\tsizemul', result[0][1])
+    print('\tsize', result[0][2])
+
+data = []
+for n1 in names:
+    for n2 in names:
+        if n1 != n2:
+            sql = "select count(size) from stocks where sym1='XRP' and ex1='" + n1 + "' and ex2='" + n2 + "';"
+            result = db.execute_sql(sql)
+            t = (n1, n2, result[0][0])
+            data.append(t)
+            print(t)
+
+data.sort(key=lambda x: x[2], reverse=True)
+print('\nsorted\n')
+for d in data:
+    print(d)
+    estimate(d)
+    print()
