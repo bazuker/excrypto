@@ -1,4 +1,4 @@
-# excrypto
+# excrypto [Deprecated]
 
 Crypto-trading bot that is able to find price spreads between currencies on different cryptocurrency trading platforms, record detected opportunities to the SQLite database and execute orders.
 
